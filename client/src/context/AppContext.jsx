@@ -1,18 +1,29 @@
 import { useUser } from "@clerk/clerk-react";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { dummyShowsData } from "../assets/assets";
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
 
+    const { user } = useUser();
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { user } = useUser();
+    const [showsData, setShowsData] = useState([]);
+
+    // Fetch Show Data
+    const fetchShowsData = async () => {
+        setShowsData(dummyShowsData);
+    };
+
+    useEffect(() => {
+        fetchShowsData();
+    }, []);
 
     const value = {
-        navigate, location, user
+        navigate, location, user, showsData
     };
 
     return (
