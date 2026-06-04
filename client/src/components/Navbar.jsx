@@ -28,7 +28,7 @@ const Navbar = () => {
                 <img src={assets.logo} alt="logo" className="w-36 h-auto" />
             </Link>
 
-            <div className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center gap-8 md:px-8 py-1 max-md:h-screen md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border border-gray-300/20 overflow-hidden transition-[width] duration-300 ${isOpen ? "max-md:w-full" : "max-md:w-0"}`}>
+            <div className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center gap-8 md:px-8 py-3 max-md:h-screen md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border border-gray-300/20 overflow-hidden transition-[width] duration-300 ${isOpen ? "max-md:w-full" : "max-md:w-0"}`}>
                 <XIcon onClick={() => { setIsOpen(!isOpen); scrollTo(0, 0) }} className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer" />
 
                 <NavLink onClick={() => { setIsOpen(!isOpen); scrollTo(0, 0) }} className={({ isActive }) => `transition duration-200 hover:text-primary ${isActive ? "text-primary" : ""}`} to="/">
