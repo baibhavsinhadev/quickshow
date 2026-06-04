@@ -1,12 +1,14 @@
 import { ToastContainer } from 'react-toastify'
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Favorite, Home, MovieDetails, Movies, MyBookings, SeatLayout } from './pages/index'
+import { useAppContext } from './context/AppContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 const App = () => {
 
-  const isAdminRoute = useLocation().pathname.startsWith("/admin")
+  const { location } = useAppContext();
+  const isAdminRoute = location.pathname.startsWith("/admin")
 
   return (
     <>
