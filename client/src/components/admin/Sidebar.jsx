@@ -44,7 +44,7 @@ const Sidebar = () => {
                             {({ isActive }) => (
                                 <>
                                     <Icon className="w-5 h-5" />
-                                    <p>{link.name}</p>
+                                    <p className="hidden md:block">{link.name}</p>
 
                                     <span className={`w-1.5 h-10 rounded-l right-0 absolute ${isActive && "bg-primary"}`} />
                                 </>
