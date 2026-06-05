@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
-import { assets, dummyDateTimeData } from "../assets/assets";
+import { useAppContext } from "../../context/AppContext";
+import { assets, dummyDateTimeData } from "../../assets/assets";
 import { toast } from "react-toastify";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
-import Loading from "../components/Loading";
-import isoTimeFormat from "../lib/isoTimeFormat";
-import BlurCircle from "../components/BlurCircle";
+import Loading from "../../components/Loading";
+import isoTimeFormat from "../../lib/isoTimeFormat";
+import BlurCircle from "../../components/BlurCircle";
 
 const SeatLayout = () => {
 

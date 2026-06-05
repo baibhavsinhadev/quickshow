@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../context/AppContext";
-import { dummyShowsData } from "../assets/assets";
-import MovieCard from "../components/MovieCard";
-import BlurCircle from "../components/BlurCircle";
+import { useAppContext } from "../../context/AppContext";
+import { dummyShowsData } from "../../assets/assets";
+import MovieCard from "../../components/user/MovieCard";
+import BlurCircle from "../../components/BlurCircle";
 import { toast } from "react-toastify";
 
 const Favorite = () => {

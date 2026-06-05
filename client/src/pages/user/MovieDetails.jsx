@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import { useEffect, useState } from "react";
-import { dummyDateTimeData } from "../assets/assets";
-import BlurCircle from "../components/BlurCircle";
+import { dummyDateTimeData } from "../../assets/assets";
+import BlurCircle from "../../components/BlurCircle";
 import { HeartIcon, PlayCircleIcon, StarIcon } from "lucide-react";
-import timeFormat from "../lib/timeFormat";
-import DateSelect from "../components/DateSelect";
-import MovieCard from "../components/MovieCard";
-import Loading from "../components/Loading";
+import timeFormat from "../../lib/timeFormat";
+import DateSelect from "../../components/user/DateSelect";
+import MovieCard from "../../components/user/MovieCard";
+import Loading from "../../components/Loading";
 
 const MovieDetails = () => {
 

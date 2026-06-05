@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
-import { useAppContext } from "../context/AppContext";
-import BlurCircle from "./BlurCircle";
+import { useAppContext } from "../../context/AppContext";
+import BlurCircle from "../BlurCircle";
 import MovieCard from "./MovieCard";
 
 const Featured = () => {

@@ -1,6 +1,6 @@
-import { useAppContext } from "../context/AppContext";
-import BlurCircle from "../components/BlurCircle";
-import MovieCard from "../components/MovieCard";
+import { useAppContext } from "../../context/AppContext";
+import BlurCircle from "../../components/BlurCircle";
+import MovieCard from "../../components/user/MovieCard";
 
 const Movies = () => {
 

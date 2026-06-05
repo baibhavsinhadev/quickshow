@@ -1,8 +1,8 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
-import BlurCircle from "./BlurCircle";
+import BlurCircle from "../BlurCircle";
 import { toast } from "react-toastify";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 
 const DateSelect = ({ dateTime, id }) => {
 
