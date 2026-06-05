@@ -12,6 +12,8 @@ import pinoHttp from "pino-http";
 import { cleanEnv, str, port } from "envalid";
 
 import logger from "./config/logger.js";
+import connectDB from "./config/mongoDB.js";
+
 import limiter from "./middleware/rateLimiting.js";
 
 // Validate env
@@ -66,12 +68,11 @@ app.use((err, req, res, next) => {
 
 // Start Server
 const startServer = async () => {
-    // if (env.MONGODB_URI) {
-    //     await connectDB();
-    //     await connectCloudinary();
-    // } else {
-    //     logger.warn("MongoDB URI not provided, skipping DB connection");
-    // }
+    if (env.MONGODB_URI) {
+        await connectDB();
+    } else {
+        logger.warn("MongoDB URI not provided, skipping DB connection");
+    }
 
     app.listen(PORT, () => {
         logger.info(`Server running on port ${PORT}`);
