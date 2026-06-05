@@ -9,7 +9,11 @@ import compression from "compression";
 
 import pinoHttp from "pino-http";
 
+import { clerkMiddleware } from '@clerk/express'
 import { cleanEnv, str, port } from "envalid";
+import { inngest } from "./inngest/index.js";
+import { serve } from "inngest/express";
+import { functions } from "./inngest/functions.js";
 
 import logger from "./config/logger.js";
 import connectDB from "./config/mongoDB.js";
@@ -32,6 +36,7 @@ app.use(pinoHttp({ logger }));
 app.use(helmet());
 app.use(hpp());
 app.use(mongoSanitize());
+app.use(clerkMiddleware());
 
 app.use("/api", limiter);
 
@@ -55,6 +60,9 @@ app.get("/", (req, res) => {
 app.get("/api/test", (req, res) => {
     res.json({ success: true, message: "Working perfectly" });
 });
+
+// API Routes
+app.use("/api/inngest", serve({ client: inngest, functions }))
 
 // Global Error Handler
 app.use((err, req, res, next) => {
