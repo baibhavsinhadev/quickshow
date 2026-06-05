@@ -18,3 +18,17 @@ body {
     color: white;
     background-color: #09090B;
 }
+
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.number-input {
+    appearance: textfield;
+}
+
+.calender-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
