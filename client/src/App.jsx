@@ -10,11 +10,17 @@ import AddShow from './pages/admin/AddShow';
 import ListShows from './pages/admin/ListShows';
 import ListBookings from './pages/admin/ListBookings';
 import ScrollToTop from './components/ScrollToTop';
+import { useEffect } from 'react';
+import Loading from './components/Loading';
 
 const App = () => {
 
-  const { location } = useAppContext();
-  const isAdminRoute = location.pathname.startsWith("/admin")
+  const { location, isLoaded, isSignedIn } = useAppContext();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  if (!isLoaded) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -28,8 +34,8 @@ const App = () => {
         <Route path='/movies' element={<Movies />} />
         <Route path='/movies/:id' element={<MovieDetails />} />
         <Route path='/movie/:id/:date' element={<SeatLayout />} />
-        <Route path='/my-bookings' element={<MyBookings />} />
-        <Route path='/favorite' element={<Favorite />} />
+        <Route path='/my-bookings' element={isSignedIn ? <MyBookings /> : <Home />} />
+        <Route path='/favorite' element={isSignedIn ? <Favorite /> : <Home />} />
 
         {/* Admin Routes */}
         <Route path='/admin' element={<Layout />}>

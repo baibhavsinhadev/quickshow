@@ -7,7 +7,7 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
 
-    const { user } = useUser();
+    const { user, isLoaded, isSignedIn } = useUser();
 
     const currency = import.meta.env.VITE_CURRENCY
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ export const AppProvider = ({ children }) => {
 
     const value = {
         navigate, location, user, showsData,
-        currency
+        currency, isSignedIn, isLoaded
     };
 
     return (
