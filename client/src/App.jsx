@@ -1,5 +1,5 @@
 import { ToastContainer } from 'react-toastify'
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { Favorite, Home, MovieDetails, Movies, MyBookings, SeatLayout } from './pages/user/index'
 import { useAppContext } from './context/AppContext';
 import Navbar from './components/user/Navbar';
@@ -34,11 +34,11 @@ const App = () => {
         <Route path='/movies' element={<Movies />} />
         <Route path='/movies/:id' element={<MovieDetails />} />
         <Route path='/movie/:id/:date' element={<SeatLayout />} />
-        <Route path='/my-bookings' element={isSignedIn ? <MyBookings /> : <Home />} />
-        <Route path='/favorite' element={isSignedIn ? <Favorite /> : <Home />} />
+        <Route path='/my-bookings' element={isSignedIn ? <MyBookings /> : <Navigate to="/" />} />
+        <Route path='/favorite' element={isSignedIn ? <Favorite /> : <Navigate to="/" />} />
 
         {/* Admin Routes */}
-        <Route path='/admin' element={<Layout />}>
+        <Route path='/admin' element={isSignedIn ? <Layout /> : <Navigate to="/" />}>
           <Route index element={<Dashboard />} />
           <Route path='add-show' element={<AddShow />} />
           <Route path='list-shows' element={<ListShows />} />
