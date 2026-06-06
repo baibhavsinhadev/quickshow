@@ -1,7 +1,22 @@
+import { v2 as cloudinary } from "cloudinary";
 import api from "../config/api.js";
 import logger from "../config/logger.js";
 import Movie from "../models/Movie.js";
 import Show from "../models/Show.js";
+
+const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/original";
+const uploadFromUrl = async (url, folder = "movies") => {
+    try {
+        const res = await cloudinary.uploader.upload(url, {
+            folder,
+            resource_type: "image",
+        });
+        return res.secure_url;
+    } catch (err) {
+        console.error("Cloudinary Upload Failed:", err.message);
+        return null;
+    }
+};
 
 // Get now playing movies : GET /api/show
 export const getNowPlayingMovies = async (req, res) => {
@@ -42,51 +57,76 @@ export const getNowPlayingMovies = async (req, res) => {
 export const addShow = async (req, res) => {
     try {
         const { movieId, showsInput, showPrice } = req.body;
+
+        if (!movieId) {
+            return res.status(400).json({
+                success: false,
+                message: "Movie ID is required",
+            });
+        }
+
         if (!showsInput) {
             return res.status(400).json({
                 success: false,
                 message: "Shows Input is required",
             });
-        };
+        }
 
         if (!showPrice) {
             return res.status(400).json({
                 success: false,
                 message: "Show Price is required",
             });
-        };
+        }
 
         let movie = await Movie.findById(movieId);
+
         if (!movie) {
-            // Fetch movie details and credits from TMDB API
+            // Fetch movie details + credits
             const [movieDetailsResponse, movieCreditsResponse] = await Promise.all([
                 api.get(`/movie/${movieId}`),
                 api.get(`/movie/${movieId}/credits`)
             ]);
 
-            const movieAPIDate = movieDetailsResponse.data;
-            const movieCreditsDate = movieCreditsResponse.data;
+            const movieData = movieDetailsResponse.data;
+            const creditsData = movieCreditsResponse.data;
+
+            // Build full TMDB image URLs
+            const posterUrl = movieData.poster_path
+                ? `${TMDB_IMAGE_BASE}${movieData.poster_path}`
+                : null;
+
+            const backdropUrl = movieData.backdrop_path
+                ? `${TMDB_IMAGE_BASE}${movieData.backdrop_path}`
+                : null;
+
+            // Upload to Cloudinary
+            const [uploadedPoster, uploadedBackdrop] = await Promise.all([
+                posterUrl ? uploadFromUrl(posterUrl) : null,
+                backdropUrl ? uploadFromUrl(backdropUrl) : null,
+            ]);
 
             const movieDetails = {
                 _id: movieId,
-                title: movieAPIDate.title,
-                overview: movieAPIDate.overview,
-                poster_path: movieAPIDate.poster_path,
-                backdrop_path: movieAPIDate.backdrop_path,
-                genres: movieAPIDate.genres,
-                casts: movieCreditsResponse.cast,
-                release_date: movieAPIDate.release_date,
-                original_language: movieAPIDate.original_language,
-                tagline: movieAPIDate.tagline || "",
-                vote_average: movieAPIDate.vote_average,
-                runtime: movieAPIDate.runtime
+                title: movieData.title,
+                overview: movieData.overview,
+                poster_path: uploadedPoster || posterUrl,
+                backdrop_path: uploadedBackdrop || backdropUrl,
+                genres: movieData.genres,
+                casts: creditsData.cast,
+                release_date: movieData.release_date,
+                original_language: movieData.original_language,
+                tagline: movieData.tagline || "",
+                vote_average: movieData.vote_average,
+                runtime: movieData.runtime
             };
 
-            // Add movie to the database
             movie = await Movie.create(movieDetails);
-        };
+        }
 
+        // Create shows
         const showsToCreate = [];
+
         showsInput.forEach((show) => {
             const showDate = show.date;
 
@@ -104,20 +144,21 @@ export const addShow = async (req, res) => {
 
         if (showsToCreate.length > 0) {
             await Show.insertMany(showsToCreate);
-        };
+        }
 
         return res.status(200).json({
             success: true,
             message: "Show Added Successfully",
         });
+
     } catch (error) {
         logger.error({ error }, "Adding New Movies Error");
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Internal Server Error",
         });
-    };
+    }
 };
 
 // Get all shows from the database : GET /api/show/all
