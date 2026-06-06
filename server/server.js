@@ -40,17 +40,15 @@ app.use(pinoHttp({ logger }));
 app.use(helmet());
 app.use(hpp());
 
-app.use(clerkMiddleware());
-
-app.use("/api", limiter);
-
 // Core Middlewares
 const corsOptions = {
-    origin: process.env.CLIENT_URL || '',
+    origin: process.env.CLIENT_URL,
     credentials: true,
 };
 
 app.use(cors(corsOptions));
+app.use(clerkMiddleware());
+app.use("/api", limiter);
 
 app.use(express.json({ limit: "10kb" }));
 app.use(compression());

@@ -1,9 +1,9 @@
-import { clerkClient } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 import logger from "../config/logger.js";
 
 const protectAdmin = async (req, res, next) => {
     try {
-        const { userId } = req.auth || {};
+        const { userId } = getAuth(req);
         if (!userId) {
             return res.status(401).json({
                 success: false,
