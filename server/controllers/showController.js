@@ -106,6 +106,23 @@ export const addShow = async (req, res) => {
                 backdropUrl ? uploadFromUrl(backdropUrl) : null,
             ]);
 
+            const casts = await Promise.all(
+                creditsData.cast.map(async (actor) => {
+                    const profileUrl = actor.profile_path
+                        ? `${TMDB_IMAGE_BASE}${actor.profile_path}`
+                        : null;
+
+                    const uploadedProfile = profileUrl
+                        ? await uploadFromUrl(profileUrl, "casts")
+                        : null;
+
+                    return {
+                        name: actor.name,
+                        profile_path: uploadedProfile || profileUrl,
+                    };
+                })
+            );
+
             const movieDetails = {
                 _id: movieId,
                 title: movieData.title,
@@ -113,7 +130,7 @@ export const addShow = async (req, res) => {
                 poster_path: uploadedPoster || posterUrl,
                 backdrop_path: uploadedBackdrop || backdropUrl,
                 genres: movieData.genres,
-                casts: creditsData.cast,
+                casts: casts,
                 release_date: movieData.release_date,
                 original_language: movieData.original_language,
                 tagline: movieData.tagline || "",
