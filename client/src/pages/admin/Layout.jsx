@@ -1,8 +1,21 @@
 import { Outlet } from "react-router-dom"
+import { useAppContext } from "../../context/AppContext";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 import AdminNavbar from "../../components/admin/AdminNavbar";
 import Sidebar from "../../components/admin/Sidebar";
 
 const Layout = () => {
+
+    const { isAdmin, navigate } = useAppContext();
+
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate("/");
+            toast.error("You are not authorized to access admin dashboard");
+        }
+    }, [isAdmin]);
+
     return (
         <>
             <AdminNavbar />

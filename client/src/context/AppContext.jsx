@@ -2,6 +2,8 @@ import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { dummyShowsData } from "../assets/assets";
+import api from "../api/api";
+import { toast } from "react-toastify";
 
 const AppContext = createContext();
 
@@ -13,7 +15,24 @@ export const AppProvider = ({ children }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [isAdmin, setIsAdmin] = useState(false);
     const [showsData, setShowsData] = useState([]);
+    const [favoriteMovies, setFavoriteMovies] = useState([]);
+
+    // Fetch isAdmin
+    const fetchIsAdmin = async () => {
+        try {
+            const { data } = await api.get("/admin/is-admin")
+
+            if (data.success) {
+                setIsAdmin(true)
+            } else {
+                toast.error(data.message);
+            };
+        } catch (error) {
+            console.log(error.message);
+        };
+    };
 
     // Fetch Show Data
     const fetchShowsData = async () => {
@@ -24,9 +43,15 @@ export const AppProvider = ({ children }) => {
         fetchShowsData();
     }, []);
 
+    useEffect(() => {
+        if (user) {
+            fetchIsAdmin();
+        }
+    }, [user])
+
     const value = {
         navigate, location, user, showsData,
-        currency, isSignedIn, isLoaded
+        currency, isSignedIn, isLoaded, isAdmin
     };
 
     return (

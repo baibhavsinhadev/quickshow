@@ -10,7 +10,7 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
-    const { user, navigate } = useAppContext();
+    const { user, navigate, isAdmin } = useAppContext();
     const { openSignIn } = useClerk();
 
     useEffect(() => {
@@ -43,9 +43,9 @@ const Navbar = () => {
                     Favorites
                 </NavLink>
 
-                <NavLink onClick={() => { setIsOpen(!isOpen); scrollTo(0, 0) }} className={({ isActive }) => `transition duration-200 hover:text-primary ${isActive ? "text-primary" : ""}`} to="/admin">
+                {isAdmin && <NavLink onClick={() => { setIsOpen(!isOpen); scrollTo(0, 0) }} className={({ isActive }) => `transition duration-200 hover:text-primary ${isActive ? "text-primary" : ""}`} to="/admin">
                     Admin
-                </NavLink>
+                </NavLink>}
             </div>
 
             <div className="flex items-center gap-8">
