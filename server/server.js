@@ -14,9 +14,10 @@ import { serve } from "inngest/express";
 import { inngest } from "./inngest/client.js";
 import { functions } from "./inngest/functions.js";
 
-import logger from "./config/logger.js";
 import limiter from "./middleware/rateLimiting.js";
+import logger from "./config/logger.js";
 import connectDB from "./config/mongoDB.js";
+import connectCloudinary from "./config/cloudinary.js";
 
 import showRouter from "./routes/showRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
@@ -85,6 +86,7 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
     if (env.MONGODB_URI) {
         await connectDB();
+        await connectCloudinary();
     } else {
         logger.warn("MongoDB URI not provided, skipping DB connection");
     }
