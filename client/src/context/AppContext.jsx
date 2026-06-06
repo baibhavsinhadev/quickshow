@@ -1,9 +1,8 @@
 import { useUser } from "@clerk/clerk-react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { dummyShowsData } from "../assets/assets";
-import api from "../api/api";
 import { toast } from "react-toastify";
+import api from "../api/api";
 
 const AppContext = createContext();
 
@@ -36,7 +35,17 @@ export const AppProvider = ({ children }) => {
 
     // Fetch Show Data
     const fetchShowsData = async () => {
-        setShowsData(dummyShowsData);
+        try {
+            const { data } = await api.get("/show/all");
+
+            if (data.success) {
+                setShowsData(data.shows);
+            } else {
+                toast.error(data.message);
+            };
+        } catch (error) {
+            console.log(error.message);
+        };
     };
 
     useEffect(() => {
