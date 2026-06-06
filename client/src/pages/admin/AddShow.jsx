@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { CheckIcon, DeleteIcon, StarIcon } from "lucide-react";
+import { CheckIcon, DeleteIcon, Loader2Icon, StarIcon } from "lucide-react";
 import Title from "../../components/admin/Title";
 import Loading from "../../components/Loading";
 import formatNumber from "../../lib/formatNumber";
+import api from "../../api/api";
+import { toast } from "react-toastify";
 
 const AddShow = () => {
 
-    const { currency, showsData, user } = useAppContext();
+    const { currency, user } = useAppContext();
 
     const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [dateTimeSelection, setDateTimeSelection] = useState({});
     const [dateTimeInput, setDateTimeInput] = useState("");
     const [showPrice, setShowPrice] = useState("");
+    const [addingShow, setAddingShow] = useState(false);
 
     // Fetch Currently Playing Movies
     const fetchNowPlayingMovies = async (params) => {
-        setNowPlayingMovies(showsData);
+        try {
+            const { data } = await api.get("/show");
+            if (data.success) {
+                setNowPlayingMovies(data.movies);
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            console.log(error.message);
+        };
     };
 
     // Handle Date Time Add Function
@@ -53,6 +65,39 @@ const AddShow = () => {
         });
     };
 
+    const handleSubmit = async () => {
+        try {
+            setAddingShow(true);
+
+            if (!selectedMovie) return toast.error("Please select movie!");
+            if (Object.keys(dateTimeSelection).length === 0) return toast.error("Please select date and time!");
+            if (!showPrice) return toast.warn("Please select show price");
+
+            const showsInput = Object.entries(dateTimeSelection).map(([date, time]) => ({ date, time }));
+
+            const payload = {
+                movieId: selectedMovie,
+                showsInput,
+                showPrice: Number(showPrice)
+            };
+
+            const { data } = await api.post("/show", payload);
+            if (data.success) {
+                toast.success(data.message);
+                setSelectedMovie(null);
+                setShowPrice("");
+                setDateTimeSelection({})
+            } else {
+                toast.error(data.message)
+            };
+        } catch (error) {
+            console.log(error.message);
+            toast.error("Internal server error");
+        } finally {
+            setAddingShow(false);
+        };
+    };
+
     useEffect(() => {
         if (user) {
             fetchNowPlayingMovies();
@@ -69,7 +114,7 @@ const AddShow = () => {
                     {nowPlayingMovies.map((playingMovie) => (
                         <div key={playingMovie.id} className={`relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300 `} onClick={() => setSelectedMovie(playingMovie.id)}>
                             <div className="relative rounded-lg overflow-hidden">
-                                <img src={playingMovie.poster_path} alt="" className="w-full object-cover brightness-90" />
+                                <img src={`${import.meta.env.VITE_TMDB_BASE_URL}${playingMovie.poster_path}`} alt="" className="w-full object-cover brightness-90" />
 
                                 <div className="text-sm flex items-center justify-between p-2 bg-black/70 w-full absolute bottom-0 left-0">
                                     <p className="flex items-center gap-1 text-gray-400">
@@ -139,6 +184,15 @@ const AddShow = () => {
                     </ul>
                 </div>
             )}
+
+            <button onClick={handleSubmit} disabled={addingShow} className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                {addingShow ? (
+                    <div className="flex items-center gap-1">
+                        <Loader2Icon className="w-4 h-4 animate-spin" />
+                        Processing...
+                    </div>
+                ) : "Add Show"}
+            </button>
         </>
     ) : (
         <Loading />
