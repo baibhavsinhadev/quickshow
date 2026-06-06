@@ -4,19 +4,17 @@ import { useEffect } from "react";
 import { toast } from "react-toastify";
 import AdminNavbar from "../../components/admin/AdminNavbar";
 import Sidebar from "../../components/admin/Sidebar";
+import Loading from "../../components/Loading";
 
 const Layout = () => {
 
-    const { isAdmin, navigate } = useAppContext();
+    const { isAdmin, fetchIsAdmin } = useAppContext();
 
     useEffect(() => {
-        if (!isAdmin) {
-            navigate("/");
-            toast.error("You are not authorized to access admin dashboard");
-        }
-    }, [isAdmin]);
+        fetchIsAdmin();
+    }, []);
 
-    return (
+    return isAdmin ? (
         <>
             <AdminNavbar />
 
@@ -28,6 +26,8 @@ const Layout = () => {
                 </div>
             </div>
         </>
+    ) : (
+        <Loading />
     );
 };
 

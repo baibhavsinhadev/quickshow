@@ -12,10 +12,11 @@ import ListBookings from './pages/admin/ListBookings';
 import ScrollToTop from './components/ScrollToTop';
 import { useEffect } from 'react';
 import Loading from './components/Loading';
+import { SignIn } from '@clerk/clerk-react';
 
 const App = () => {
 
-  const { location, isLoaded, isSignedIn } = useAppContext();
+  const { location, isLoaded, isSignedIn, isAdmin } = useAppContext();
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   if (!isLoaded) {
@@ -38,7 +39,11 @@ const App = () => {
         <Route path='/favorite' element={isSignedIn ? <Favorite /> : <Navigate to="/" />} />
 
         {/* Admin Routes */}
-        <Route path='/admin' element={isSignedIn ? <Layout /> : <Navigate to="/" />}>
+        <Route path='/admin' element={isAdmin ? <Layout /> : (
+          <div className='min-h-screen flex justify-center items-center'>
+            <SignIn fallbackRedirectUrl="/admin" />
+          </div>
+        )}>
           <Route index element={<Dashboard />} />
           <Route path='add-show' element={<AddShow />} />
           <Route path='list-shows' element={<ListShows />} />
