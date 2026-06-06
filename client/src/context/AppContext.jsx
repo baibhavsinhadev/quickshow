@@ -48,6 +48,21 @@ export const AppProvider = ({ children }) => {
         };
     };
 
+    // Fetch Favorite Movies
+    const fetchFavoritesMovies = async () => {
+        try {
+            const { data } = await api.get("/user/favorite");
+
+            if (data.success) {
+                setFavoriteMovies(data.movies);
+            } else {
+                toast.error(data.message);
+            };
+        } catch (error) {
+            console.log(error.message);
+        };
+    };
+
     useEffect(() => {
         fetchShowsData();
     }, []);
@@ -55,12 +70,14 @@ export const AppProvider = ({ children }) => {
     useEffect(() => {
         if (user) {
             fetchIsAdmin();
+            fetchFavoritesMovies();
         }
     }, [user])
 
     const value = {
         navigate, location, user, showsData,
-        currency, isSignedIn, isLoaded, isAdmin
+        currency, isSignedIn, isLoaded, isAdmin,
+        fetchIsAdmin, favoriteMovies, fetchFavoritesMovies
     };
 
     return (
