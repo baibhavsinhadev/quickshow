@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
+import logger from "../config/logger.js";
 
 // Function to check availability of selected seats for a movie
 const checkSeatsAvailability = async (showId, selectedSeats) => {
