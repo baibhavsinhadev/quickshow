@@ -4,7 +4,6 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import hpp from "hpp";
-import mongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
 
 import pinoHttp from "pino-http";
@@ -16,9 +15,10 @@ import { inngest } from "./inngest/client.js";
 import { functions } from "./inngest/functions.js";
 
 import logger from "./config/logger.js";
+import limiter from "./middleware/rateLimiting.js";
 import connectDB from "./config/mongoDB.js";
 
-import limiter from "./middleware/rateLimiting.js";
+import showRouter from "./routes/showRoutes.js";
 
 // Validate env
 const env = cleanEnv(process.env, {
@@ -36,17 +36,13 @@ app.use(pinoHttp({ logger }));
 app.use(helmet());
 app.use(hpp());
 
-if (env.NODE_ENV === 'development') {
-    app.use(mongoSanitize());
-}
-
 app.use(clerkMiddleware());
 
 app.use("/api", limiter);
 
 // Core Middlewares
 const corsOptions = {
-    origin: process.env.CLIENT_URL,
+    origin: process.env.CLIENT_URL || '',
     credentials: true,
 };
 
@@ -67,6 +63,7 @@ app.get("/api/test", (req, res) => {
 
 // API Routes
 app.use("/api/inngest", serve({ client: inngest, functions }))
+app.use("/api/show", showRouter)
 
 // Global Error Handler
 app.use((err, req, res, next) => {
