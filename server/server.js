@@ -11,8 +11,8 @@ import pinoHttp from "pino-http";
 
 import { clerkMiddleware } from '@clerk/express'
 import { cleanEnv, str, port } from "envalid";
-import { inngest } from "./inngest/index.js";
 import { serve } from "inngest/express";
+import { inngest } from "./inngest/client.js";
 import { functions } from "./inngest/functions.js";
 
 import logger from "./config/logger.js";
