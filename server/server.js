@@ -19,6 +19,7 @@ import limiter from "./middleware/rateLimiting.js";
 import connectDB from "./config/mongoDB.js";
 
 import showRouter from "./routes/showRoutes.js";
+import bookingRouter from "./routes/bookingRoutes.js";
 
 // Validate env
 const env = cleanEnv(process.env, {
@@ -64,6 +65,7 @@ app.get("/api/test", (req, res) => {
 // API Routes
 app.use("/api/inngest", serve({ client: inngest, functions }))
 app.use("/api/show", showRouter)
+app.use("/api/booking", bookingRouter)
 
 // Global Error Handler
 app.use((err, req, res, next) => {
