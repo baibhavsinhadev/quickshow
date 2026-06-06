@@ -35,7 +35,11 @@ app.use(pinoHttp({ logger }));
 // Security Middlewares
 app.use(helmet());
 app.use(hpp());
-app.use(mongoSanitize());
+
+if (env.NODE_ENV === 'development') {
+    app.use(mongoSanitize());
+}
+
 app.use(clerkMiddleware());
 
 app.use("/api", limiter);
