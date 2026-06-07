@@ -1,3 +1,4 @@
+import { inngest } from "../inngest/client.js";
 import stripe from "stripe";
 import logger from "../config/logger.js";
 import Booking from "../models/Booking.js";
@@ -32,6 +33,13 @@ const stripeWebhooks = async (request, response) => {
                     paymentLink: ""
                 });
 
+                // Send Confirmation Email
+                await inngest.send({
+                    name: "app/show.booked",
+                    data: {
+                        bookingId
+                    }
+                });
                 break;
             }
 
