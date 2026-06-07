@@ -1,21 +1,23 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
-import { assets, dummyDateTimeData } from "../../assets/assets";
+import { assets } from "../../assets/assets";
 import { toast } from "react-toastify";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
 import Loading from "../../components/Loading";
 import isoTimeFormat from "../../lib/isoTimeFormat";
 import BlurCircle from "../../components/BlurCircle";
+import api from "../../api/api";
 
 const SeatLayout = () => {
 
     const groupRows = [["A", "B"], ["C", "D"], ["E", "F"], ["G", "H"], ["I", "J"]];
 
-    const { navigate, showsData } = useAppContext();
+    const { navigate, user } = useAppContext();
     const { id, date } = useParams();
 
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [occupiedSeats, setOccupiedSeats] = useState([]);
 
     const [selectedTime, setSelectedTime] = useState(null);
     const [show, setShow] = useState(null);
@@ -23,19 +25,27 @@ const SeatLayout = () => {
 
     // Fetch Each Show Details
     const getShow = async () => {
-        const movie = showsData.find((show) => show._id === id);
-        if (!movie) return;
+        try {
+            const { data } = await api.get(`/show/${id}`);
 
-        setShow({
-            movie,
-            dateTime: dummyDateTimeData
-        });
+            if (data.success) {
+                setShow(data);
+            } else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Internal Server Error");
+        } finally {
+            setLoading(false)
+        };
     };
 
     // Handle Seat Click
     const handleSeatClick = (seatId) => {
         if (!selectedTime) return toast.warn("Please select time first!");
         if (!selectedSeats.includes(seatId) && selectedSeats.length > 4) return toast.warn("You can only select 5 seats");
+        if (occupiedSeats.includes(seatId)) return toast.warn("This seat is already booked");
 
         setSelectedSeats(prev => prev.includes(seatId) ? prev.filter((seat) => seat !== seatId) : [...prev, seatId]);
     };
@@ -49,7 +59,7 @@ const SeatLayout = () => {
                         const seatId = `${row}${i + 1}`;
 
                         return (
-                            <button key={seatId} onClick={() => handleSeatClick(seatId)} className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"}`}>
+                            <button key={seatId} onClick={() => handleSeatClick(seatId)} className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && "bg-primary text-white"} ${occupiedSeats.includes(seatId) && "opacity-50 cursor-not-allowed"}`}>
                                 {seatId}
                             </button>
                         )
@@ -61,22 +71,56 @@ const SeatLayout = () => {
 
     // Handle Checkout
     const handleCheckout = async () => {
+        if (!user) return toast.warn("Please login to proceed!");
         if (!selectedTime) return toast.warn("Please select time first!");
         if (selectedSeats.length === 0) return toast.warn("Please select seat to checkout");
 
-        setLoading(true);
+        try {
+            setLoading(true);
 
-        setTimeout(() => {
-            navigate("/my-bookings");
-            setLoading(false);
-        }, 2000);
+            const { data } = await api.post("/booking", { showId: selectedTime.showId, selectedSeats });
+
+            if (data.success) {
+                toast.success(data.message)
+                navigate("/my-bookings")
+            } else {
+                toast.error(data.message)
+            };
+        } catch (error) {
+            console.log(error);
+            toast.error("Internal Server Error");
+        } finally {
+            setLoading(false)
+        };
+    };
+
+    // Getting Occupied Seats
+    const getOccupiedSeats = async () => {
+        try {
+            const { data } = await api.get(`/booking/${selectedTime.showId}`);
+
+            if (data.success) {
+                setOccupiedSeats(data.occupiedSeats)
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Internal Server Error");
+        } finally {
+            setLoading(false)
+        }
     };
 
     useEffect(() => {
-        if (showsData.length > 0) {
-            getShow();
-        }
-    }, [id, showsData]);
+        getShow();
+    }, [id]);
+
+    useEffect(() => {
+        if (selectedTime) {
+            getOccupiedSeats();
+        };
+    }, [selectedTime]);
 
     return show ? (
         <div className="flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-40">

@@ -1,3 +1,4 @@
+import { getAuth } from "@clerk/express";
 import mongoose from "mongoose";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
@@ -7,9 +8,9 @@ import logger from "../config/logger.js";
 const checkSeatsAvailability = async (showId, selectedSeats) => {
     try {
         const showData = await Show.findById(showId);
-        if (!showData) false;
+        if (!showData) return false;
 
-        const occupiedSeats = showData.occupiedSeats;
+        const occupiedSeats = showData.occupiedSeats || {};
 
         const isAnySeatTaken = selectedSeats.some((seat) => occupiedSeats[seat]);
         return !isAnySeatTaken;
