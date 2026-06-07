@@ -36,6 +36,7 @@ const App = () => {
         <Route path='/movies/:id' element={<MovieDetails />} />
         <Route path='/movie/:id/:date' element={<SeatLayout />} />
         <Route path='/my-bookings' element={isSignedIn ? <MyBookings /> : <Navigate to="/" />} />
+        <Route path='/loading/:nextUrl' element={<Loading />} />
         <Route path='/favorite' element={isSignedIn ? <Favorite /> : <Navigate to="/" />} />
 
         {/* Admin Routes */}

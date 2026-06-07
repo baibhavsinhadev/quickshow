@@ -31,13 +31,11 @@ export const createBooking = async (req, res) => {
         // Check if the seat is available for the selected show
         const isAvailable = await checkSeatsAvailability(showId, selectedSeats);
         if (!isAvailable) {
-            if (shows.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Selected seats are not available",
-                });
-            };
-        };
+            return res.status(400).json({
+                success: false,
+                message: "Selected seats are already booked"
+            });
+        }
 
         // Get the show details
         const showData = await Show.findById(showId).populate("movie");
@@ -65,7 +63,7 @@ export const createBooking = async (req, res) => {
             price_data: {
                 currency: "usd",
                 product_data: {
-                    name: showDate.movie.title
+                    name: showData.movie.title
                 },
                 unit_amount: Math.floor(booking.amount) * 100
             },

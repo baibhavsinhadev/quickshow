@@ -81,8 +81,7 @@ const SeatLayout = () => {
             const { data } = await api.post("/booking", { showId: selectedTime.showId, selectedSeats });
 
             if (data.success) {
-                toast.success(data.message)
-                navigate("/my-bookings")
+                window.location.href = data.url;
             } else {
                 toast.error(data.message)
             };
