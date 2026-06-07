@@ -15,6 +15,8 @@ import { inngest } from "./inngest/client.js";
 import { functions } from "./inngest/functions.js";
 
 import limiter from "./middleware/rateLimiting.js";
+import stripeWebhooks from "./controllers/stripeWebhooks.js";
+
 import logger from "./config/logger.js";
 import connectDB from "./config/mongoDB.js";
 import connectCloudinary from "./config/cloudinary.js";
@@ -49,6 +51,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(clerkMiddleware());
 app.use("/api", limiter);
+
+// Stripe Webhooks Route
+app.use("/stripe", express.raw({ type: "application/json" }), stripeWebhooks)
 
 app.use(express.json({ limit: "10kb" }));
 app.use(compression());
