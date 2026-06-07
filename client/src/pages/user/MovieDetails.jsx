@@ -8,30 +8,53 @@ import timeFormat from "../../lib/timeFormat";
 import DateSelect from "../../components/user/DateSelect";
 import MovieCard from "../../components/user/MovieCard";
 import Loading from "../../components/Loading";
+import api from "../../api/api";
+import { toast } from "react-toastify";
 
 const MovieDetails = () => {
 
     const { id } = useParams();
-    const { navigate, showsData } = useAppContext();
+    const { navigate, showsData, user, favoriteMovies, fetchFavoritesMovies } = useAppContext();
 
     const [show, setShow] = useState(null);
 
     // Fetch Each Show Details
     const getShow = async () => {
-        const movie = showsData.find((show) => show._id === id);
-        if (!movie) return;
+        try {
+            const { data } = await api.get(`/show/${id}`);
 
-        setShow({
-            movie,
-            dateTime: dummyDateTimeData
-        });
+            if (data.success) {
+                setShow(data)
+            } else {
+                toast.error(data.message)
+            };
+        } catch (error) {
+            console.log(error.message);
+            toast.error("Internal Server Error")
+        };
+    };
+
+    // Handle Favorite
+    const handleFavorite = async () => {
+        try {
+            if (!user) toast.warn("Please login to proceed");
+
+            const { data } = await api.post(`/user/favorite/${id}`);
+            if (data.success) {
+                await fetchFavoritesMovies();
+                toast.success(data.message);
+            } else {
+                toast.error(data.message);
+            }
+        } catch (error) {
+            console.log(error.message);
+            toast.error("Internal Server Error")
+        };
     };
 
     useEffect(() => {
-        if (showsData.length > 0) {
-            getShow();
-        }
-    }, [id, showsData]);
+        getShow();
+    }, [id]);
 
     return show ? (
         <div className="px-6 md:px-16 lg:px-40 pt-30 md:pt-40">
@@ -63,8 +86,11 @@ const MovieDetails = () => {
 
                         <a href="#dateSelect" className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-md font-medium cursor-pointer active:scale-95">Buy Tickets</a>
 
-                        <button className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95">
-                            <HeartIcon className={`w-5 h-5`} />
+                        <button onClick={handleFavorite} className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95">
+                            <HeartIcon className={`w-5 h-5 transition-all duration-200 cursor-pointer ${favoriteMovies.some((movie) => movie._id === id)
+                                    ? "fill-primary text-primary"
+                                    : "text-gray-400 hover:text-primary-dull"
+                                }`} />
                         </button>
                     </div>
                 </div>
@@ -74,7 +100,7 @@ const MovieDetails = () => {
 
             <div className="overflow-x-auto mt-8 pb-4">
                 <div className="flex items-center gap-4 w-max px-4">
-                    {show.movie.casts.slice(0, 10).map((cast) => (
+                    {show.movie.casts.filter((cast) => cast.profile_path).slice(0, 10).map((cast) => (
                         <div key={cast.name} className="flex flex-col items-center text-center">
                             <img src={cast.profile_path} alt="profile" className="rounded-full  h-20 aspect-square object-cover object-top" />
 

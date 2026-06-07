@@ -1,4 +1,4 @@
-import { clerkClient } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 import logger from "../config/logger.js";
 import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
@@ -6,7 +6,7 @@ import Movie from "../models/Movie.js";
 // API Controller Function to Get User Bookings : GET /api/user/bookings
 export const getUserBookings = async (req, res) => {
     try {
-        const userId = req.auth.userId;
+        const { userId } = getAuth(req);
         const limit = Math.min(Number(req.query.limit) || 10, 50);
 
         const bookings = await Booking.find({ user: userId }).populate({
@@ -34,7 +34,7 @@ export const getUserBookings = async (req, res) => {
 export const addFavorite = async (req, res) => {
     try {
         const { movieId } = req.body;
-        const userId = req.auth.userId;
+        const { userId } = getAuth(req);
 
         const user = await clerkClient.users.getUser(userId);
 
@@ -68,7 +68,7 @@ export const addFavorite = async (req, res) => {
 export const updateFavorite = async (req, res) => {
     try {
         const { movieId } = req.params;
-        const userId = req.auth.userId;
+        const { userId } = getAuth(req);
 
         const user = await clerkClient.users.getUser(userId);
 
@@ -103,10 +103,10 @@ export const updateFavorite = async (req, res) => {
 // API Controller Function to Get Favorite Movie in Clerk User Meta Data : GET /api/user/favorite
 export const getFavorite = async (req, res) => {
     try {
-        const userId = req.auth.userId;
+        const { userId } = getAuth(req);
 
         const user = await clerkClient.users.getUser(userId);
-        const favorites = user.privateMetadata.favorites;
+        const favorites = user.privateMetadata.favorites || [];
 
         // Get movies from database
         const movies = await Movie.find({ _id: { $in: favorites } });
