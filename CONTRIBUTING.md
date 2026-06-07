@@ -16,7 +16,7 @@ Click on the **Fork** button and create your own copy of the repository.
 ### 2. Clone the Repository
 
 ```
-git clone https://github.com/your-username/quickshow.git
+git clone https://github.com/baibhavsinhadev/quickshow.git
 cd quickshow
 ```
 
