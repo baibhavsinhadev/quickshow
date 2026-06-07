@@ -1,4 +1,5 @@
 import { getAuth } from "@clerk/express";
+import { inngest } from "../inngest/client.js";
 import mongoose from "mongoose";
 import Booking from "../models/Booking.js";
 import Show from "../models/Show.js";
@@ -83,6 +84,14 @@ export const createBooking = async (req, res) => {
 
         booking.paymentLink = session.url;
         await booking.save();
+
+        // Run Inngest Scheduler Function to check payment status after 10 minutes
+        await inngest.send({
+            name: "app/checkpayment",
+            data: {
+                bookingId: booking._id.toString()
+            }
+        });
 
         return res.status(200).json({
             success: true,
