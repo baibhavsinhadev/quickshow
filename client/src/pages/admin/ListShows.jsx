@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
+import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/Title";
 import dateFormat from "../../lib/dateFormat";
+import api from "../../api/api";
 
 const ListShows = () => {
 
-    const { currency, showsData, user } = useAppContext();
+    const { currency, user } = useAppContext();
 
     const [shows, setShows] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,50 +16,19 @@ const ListShows = () => {
     // Fetch All Shows
     const fetchAllShows = async () => {
         try {
-            setShows([
-                {
-                    movie: showsData[0],
-                    showDateTime: "2025-06-30T02:30:00.000Z",
-                    showPrice: 59,
-                    occupiedSeats: {
-                        A1: "user_1",
-                        B1: "user_2",
-                        C1: "user_3",
-                    }
-                },
-                {
-                    movie: showsData[1],
-                    showDateTime: "2025-08-30T02:30:00.000Z",
-                    showPrice: 59,
-                    occupiedSeats: {
-                        A1: "user_1",
-                        B1: "user_2",
-                        C1: "user_3",
-                        D1: "user_1",
-                        E1: "user_2",
-                        F1: "user_3",
-                    }
-                },
-                {
-                    movie: showsData[2],
-                    showDateTime: "2025-12-30T02:30:00.000Z",
-                    showPrice: 59,
-                    occupiedSeats: {
-                        A1: "user_1",
-                        B1: "user_2",
-                        C1: "user_3",
-                        D1: "user_1",
-                        E1: "user_2"
-                    }
-                },
-            ]);
+            const { data } = await api.get("/admin/shows");
 
-            setTimeout(() => {
-                setLoading(false);
-            }, 2000);
+            if (data.success) {
+                setShows(data.shows);
+            } else {
+                toast.error(data.message)
+            };
         } catch (error) {
-            console.log(error)
-        }
+            console.log(error);
+            toast.error("Internal Server Error");
+        } finally {
+            setLoading(false)
+        };
     };
 
     useEffect(() => {

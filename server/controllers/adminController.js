@@ -43,7 +43,7 @@ export const getDashboardData = async (req, res) => {
 // API to get all shows : GET /api/admin/shows
 export const getAllShows = async (req, res) => {
     try {
-        const shows = await Show.find({ showDateTime: {} }).populate("movie").sort();
+        const shows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie").sort();
         if (!shows) {
             return res.status(400).json({
                 success: false,
