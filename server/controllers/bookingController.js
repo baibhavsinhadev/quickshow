@@ -22,7 +22,7 @@ const checkSeatsAvailability = async (showId, selectedSeats) => {
 // Create Bookings : POST /api/booking
 export const createBooking = async (req, res) => {
     try {
-        const { userId } = req.auth;
+        const { userId } = getAuth(req);
         const { showId, selectedSeats } = req.body;
         const { origin } = req.headers;
 
