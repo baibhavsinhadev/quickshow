@@ -145,14 +145,33 @@ export const addShow = async (req, res) => {
         const showsToCreate = [];
 
         showsInput.forEach((show) => {
-            const showDate = show.date;
+            if (!show.date) {
+                console.log("Missing date:", show);
+                return;
+            };
+
+            if (!Array.isArray(show.time)) {
+                console.log("Invalid time array:", show);
+                return;
+            };
 
             show.time.forEach((time) => {
-                const dateTimeString = `${showDate}T${time}`;
+                if (!time) {
+                    console.log("Missing time:", show);
+                    return;
+                };
+
+                const dateTimeString = `${show.date}T${time}`;
+                const parsedDate = new Date(dateTimeString);
+
+                if (isNaN(parsedDate.getTime())) {
+                    console.log("Invalid dateTime:", dateTimeString);
+                    return;
+                }
 
                 showsToCreate.push({
                     movie: movieId,
-                    showDateTime: new Date(dateTimeString),
+                    showDateTime: parsedDate,
                     showPrice,
                     occupiedSeats: {}
                 });

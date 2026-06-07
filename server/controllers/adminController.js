@@ -15,7 +15,7 @@ export const isAdmin = async (req, res) => {
 export const getDashboardData = async (req, res) => {
     try {
         const bookings = await Booking.find({ isPaid: true });
-        const activeShows = await Show.find({ showDateTime: {} }).populate("movie");
+        const activeShows = await Show.find({ showDateTime: { $gte: new Date() } }).populate("movie");
 
         const totalUser = await User.countDocuments();
 
@@ -31,7 +31,7 @@ export const getDashboardData = async (req, res) => {
             dashboardData
         });
     } catch (error) {
-        logger.error({ error }, "Create Booking Error");
+        logger.error({ error }, "Getting Dashboard Data Error");
 
         return res.status(500).json({
             success: false,

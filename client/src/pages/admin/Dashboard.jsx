@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { ChartLineIcon, CircleDollarSignIcon, PlayCircleIcon, StarIcon, Users2Icon } from "lucide-react";
-import { dummyDashboardData } from "../../assets/assets";
+import { toast } from "react-toastify";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/Title";
 import BlurCircle from "../../components/BlurCircle";
 import dateFormat from "../../lib/dateFormat";
+import api from "../../api/api";
 
 const Dashboard = () => {
 
@@ -44,11 +45,20 @@ const Dashboard = () => {
 
     // Fetch Dashboard Data
     const fetchDashboardData = async () => {
-        setDashboardData(dummyDashboardData);
+        try {
+            const { data } = await api.get("/admin/dashboard");
 
-        setTimeout(() => {
+            if (data.success) {
+                setDashboardData(data.dashboardData)
+            } else {
+                toast.error(data.message)
+            };
+        } catch (error) {
+            console.log(error.message);
+            toast.error("Internal server error");
+        } finally {
             setLoading(false);
-        }, 2000);
+        };
     };
 
     useEffect(() => {
@@ -104,7 +114,7 @@ const Dashboard = () => {
                             </p>
                         </div>
 
-                        <p className="px-2 pt-2 text-sm text-gray-500">{dateFormat(show.showDateTime)}</p>
+                        <p className="px-2 pt-2 text-sm text-gray-500">{show.showDateTime ? dateFormat(show.showDateTime) : "Invalid date"}</p>
                     </div>
                 ))}
             </div>
